@@ -14,8 +14,9 @@
    de seguridad muy basica.
 
 En este punto se puede realizar una prueba basica en donde los endpoints que no tienen restriccion
-se pueden acceder (AuthController) y los endpoints que tienen restriccion no tienen acceso
-(DemoController). Esto confirma que la implementacion de Spring Security está bien.
+(url localhost:8080/auth/login y url localhost:8080/auth/register)
+se pueden acceder (AuthController) y los endpoints que tienen restriccion (url localhost:8080/demo/controller) 
+no tienen acceso (DemoController). Esto confirma que la implementacion de Spring Security está bien.
 
 * ----------------------------------------------------------------------------------------------
 * ----------------------------------------------------------------------------------------------
@@ -74,9 +75,90 @@ En estas 3 clases ultimas clases creadas se implementan las anotaciones de lombo
 
 17) [modificar] la class SecurityConfig que está dentro del paquete config.
 
-En este punto podemos realizar otra prueba.Aca podemos crear un registro y comprobar en la 
-base de datos si todo ha ocurrido como se esperaba.Si todo está bien, el registro nos devuelve
-un token.
+En este punto podemos realizar otra prueba en la url localhost:8080/auth/register.Aca podemos crear un 
+registro y comprobar en la base de datos si todo ha ocurrido como se esperaba.Si todo está bien, 
+el registro nos devuelve un token.
+
+	{
+		"username" : "luis123@live.com",
+		"password" : "1234",
+		"firstName" : "Luis",
+		"lastname" : "Saa",
+		"country" : "Colombia"
+	}
 
 Entre la primera prueba y esta segunda prueba hemos modificado dos clases que son
 AuthController y SecurityConfig.Ademas hemos creado 10 clases e interfaces.
+
+* ----------------------------------------------------------------------------------------------
+* ----------------------------------------------------------------------------------------------
+
+* PARTE 3, CONFIGURANDO LOGIN
+
+18) [modificar] la class AuthService.Implementar la logica del metodo login.
+
+En este punto hacemos una nueva prueba de login en donde en la url localhost:8080/auth/login, pasamos en el cuerpo
+de la peticion el username y el password. si todo funciona bien nos devuelve el token. sino nos devuelve un codigo
+de acceso prohibido 403.
+
+	{
+		"username" : "luis123@live.com",
+		"password" : "1234"
+	}
+
+19) [modificar] la class JwtService creando los metodos :
+
+	//2)
+	public String getUsernameFromToken(String token) {
+
+		return getClaim(token, Claims::getSubject);
+	}
+
+	//6)
+	public boolean isTokenvalid(String token, UserDetails userDetails) {
+
+	    final String username = getUsernameFromToken(token);
+	    return (username.equals(userDetails.getUsername()) && isTokenExpired(token)); //devuelve true o false
+	}
+
+	//1) creamos este metodo primero
+	//se llama desde getUsernameFromToken(String token) y getExpiration(String token)
+	public <T> T getClaim(String token, Function<Claims, T> claimsResolver){
+
+	    final Claims claims = getAllClaims(token);
+	    return claimsResolver.apply(claims);
+	}
+
+	//metodos para usar con isTokenValid()
+	//metodo para usar con getClaim():
+	//4)
+	private Claims getAllClaims(String token ){
+
+	    return Jwts
+	            .parserBuilder()
+	            .setSigningKey(getKey())
+	            .build()
+	            .parseClaimsJwt(token)
+	            .getBody();
+	}
+
+    //3)
+    private Date getExpiration(String token){
+
+        return getClaim(token, Claims::getExpiration);
+    }
+
+    //metodo que sera llamado desde isTokenValid()
+    //5)
+    private boolean isTokenExpired(String token){
+
+        return getExpiration(token).before(new Date());
+    }
+
+19) [modificar] el metodo doFilterInternal() dentro de la class JwtAuthenticationFilter que se 
+    encuentra dentro del paquete jwt.
+
+En este punto hacemos una prueba final.
+
+//PRUEBA FALLIDA .DEVOLVERME EN EL VIDEO(56:50) HASTA LA PRUEBA ANTERIOR QUE SI SALIO BIEN Y VERIFICAR TODO.
+//SINO COMPARAR CLASE POR CLASE CON CODIGO DE GITHUB.
