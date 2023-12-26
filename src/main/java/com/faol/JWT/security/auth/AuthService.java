@@ -18,10 +18,10 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
-    //esta instancia la agregamos al final para el login
+    //This instance is created at the end to use in the logic of the login method
     private final AuthenticationManager authenticationManager;
 
-    //configuramos este metodo al final despues de haber configurado register
+    //logic of this method at the end, after the register method
     public AuthResponse login(LoginRequest loginRequest){
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         UserDetails userDetails = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow();
@@ -29,7 +29,7 @@ public class AuthService {
         return AuthResponse.builder().token(token).build();
     }
 
-    //primero configuramos register.login lo dejamos para la parte final.
+    //first the logic for this method
     public AuthResponse register(RegisterRequest registerRequest){
         User user = User.builder()
                 .username(registerRequest.getUsername())

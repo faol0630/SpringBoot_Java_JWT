@@ -32,6 +32,7 @@ public class SecurityConfig {
 
                 })
                 //.formLogin(withDefaults())
+                //Up to this point it is the basic configuration before implementing JWT
                 .sessionManagement(sessionManager -> {
                     sessionManager.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
                 })

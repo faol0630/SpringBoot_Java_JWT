@@ -22,7 +22,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    //estas instancias van al final para concretar el acceso a endpoints protegidos:
+    //These instances are created in the final part to specify access to protected endpoints:
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         final String token = getTokenFromRequest(request);
-        //para prueba final
+        //final configuration
         //1)
         final String username;
 

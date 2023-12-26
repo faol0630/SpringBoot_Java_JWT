@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
-@RequiredArgsConstructor //lombok, contructor por defecto con los atributos final.
+@RequiredArgsConstructor //lombok, default constructor with final attributes.
 public class AuthController {
 
     private final AuthService authService;

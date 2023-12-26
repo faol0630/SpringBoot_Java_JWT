@@ -93,7 +93,7 @@ AuthController y SecurityConfig.Ademas hemos creado 10 clases e interfaces.
 * ----------------------------------------------------------------------------------------------
 * ----------------------------------------------------------------------------------------------
 
-* PARTE 3, CONFIGURANDO LOGIN
+* PARTE 3, CONFIGURANDO LOGIN PARTE FINAL
 
 18) [modificar] la class AuthService.Implementar la logica del metodo login.
 
@@ -118,7 +118,7 @@ de acceso prohibido 403.
 	public boolean isTokenvalid(String token, UserDetails userDetails) {
 
 	    final String username = getUsernameFromToken(token);
-	    return (username.equals(userDetails.getUsername()) && isTokenExpired(token)); //devuelve true o false
+	    return (username.equals(userDetails.getUsername()) && !isTokenExpired(token)); //devuelve true o false
 	}
 
 	//1) creamos este metodo primero
@@ -158,7 +158,8 @@ de acceso prohibido 403.
 19) [modificar] el metodo doFilterInternal() dentro de la class JwtAuthenticationFilter que se 
     encuentra dentro del paquete jwt.
 
-En este punto hacemos una prueba final.
+En este punto hacemos una prueba final.En esta prueba despues de acceder usando 
+la url localhost:8080/auth/login, mediante la url localhost:8080/demo/message pasando el token que 
+devuelve el metodo login , podemos acceder al endpoint protegido(demo controller).Si todo sale
+bien podremos ver el mensaje que devuelve este endpoint.
 
-//PRUEBA FALLIDA .DEVOLVERME EN EL VIDEO(56:50) HASTA LA PRUEBA ANTERIOR QUE SI SALIO BIEN Y VERIFICAR TODO.
-//SINO COMPARAR CLASE POR CLASE CON CODIGO DE GITHUB.

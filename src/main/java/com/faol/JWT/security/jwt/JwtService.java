@@ -38,11 +38,10 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-    //hasta esta parte es la implementacion que se hace en la primera parte que tiene que
-    //ver con login.
+    //Up to here is the implementation that is done in the first part
     //-----------------------------------------------------------------------------------
 
-    //estos metodos se implementan al final para poder tener acceso a endpoints protegidos:
+    //These methods are implemented at the end to be able to access protected endpoints:
     //2)
     public String getUsernameFromToken(String token) {
         return getClaim(token, Claims::getSubject);
@@ -52,20 +51,20 @@ public class JwtService {
     public boolean isTokenvalid(String token, UserDetails userDetails) {
 
         final String username = getUsernameFromToken(token);
-        //si son iguales y si el token no ha expirado.Poner signo de admiracion:
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token)); //devuelve true o false
+        //if they are equal and if the token has not expired
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token)); //return true o false
     }
 
-    //1) creamos este metodo primero
-    //se llama desde getUsernameFromToken(String token) y getExpiration(String token)
+    //1) create this method first
+    //method called from getUsernameFromToken(String token) and getExpiration(String token)
     public <T> T getClaim(String token, Function<Claims, T> claimsResolver){
 
         final Claims claims = getAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    //metodos para usar con isTokenValid()
-    //metodo para usar con getClaim():
+    //methods to use with isTokenValid()
+    //method to use with getClaim():
     //4)
     private Claims getAllClaims(String token ){
 
@@ -84,7 +83,7 @@ public class JwtService {
         return getClaim(token, Claims::getExpiration);
     }
 
-    //metodo que sera llamado desde isTokenValid()
+    //method that will be called from isTokenValid()
     //5)
     private boolean isTokenExpired(String token){
 

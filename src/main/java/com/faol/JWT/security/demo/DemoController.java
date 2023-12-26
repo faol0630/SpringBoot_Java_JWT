@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/demo")
 public class DemoController {
 
-    //despues de ingresar user y password entra aca por defecto si tiene @GetMapping:
+    //after entering user and password, it shows this endpoint due to @GetMapping:
 
-    @PostMapping("/message")
+    @GetMapping("/message")
     public String getMessage(){
         return "Message from protected endpoint";
     }
