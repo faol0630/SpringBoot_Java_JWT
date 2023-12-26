@@ -2,7 +2,9 @@ package com.faol.JWT.security.auth;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,13 +13,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor //lombok, contructor por defecto con los atributos final.
 public class AuthController {
 
+    private final AuthService authService;
+
     @PostMapping("/login")
-    public String login (){
-        return  "Login from public endpoint";
+    public ResponseEntity<AuthResponse> login (@RequestBody LoginRequest loginRequest){
+
+        return ResponseEntity.ok(authService.login(loginRequest));
     }
 
     @PostMapping("/register")
-    public String register(){
-        return "Register from public endPoint";
+    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest registerRequest){
+
+        return ResponseEntity.ok(authService.register(registerRequest));
     }
+
 }
