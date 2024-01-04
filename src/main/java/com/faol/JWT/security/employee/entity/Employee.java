@@ -1,25 +1,47 @@
-package com.faol.JWT.security.crud.controller.dto;
+package com.faol.JWT.security.employee.entity;
 
+import com.faol.JWT.security.deparment.entity.Department;
+import jakarta.persistence.*;
 import lombok.Builder;
 
+@Entity
+@Table(name = "employee")
 @Builder
-public class EmployeeDTO {
+public class Employee {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long employee_id;
+
+    @Column(name = "name", nullable = false, unique = true, length = 40)
     private String name;
+
+    @Column(name = "lastname", nullable = false, length = 40)
     private String lastname;
+
+    @Column(name = "phone_number", nullable = false,  length = 10)
     private String phone_number;
+
+    @Column(name = "email", nullable = false,  length = 40)
     private String email;
 
-    public EmployeeDTO() {
+    @ManyToOne
+    @JoinColumn(
+            name = "department_id",
+            referencedColumnName = "department_id"
+    )
+    private Department department;
+
+    public Employee() {
     }
 
-    public EmployeeDTO(Long employee_id, String name, String lastname, String phone_number, String email) {
+    public Employee(Long employee_id, String name, String lastname, String phone_number, String email, Department department) {
         this.employee_id = employee_id;
         this.name = name;
         this.lastname = lastname;
         this.phone_number = phone_number;
         this.email = email;
+        this.department = department;
     }
 
     public Long getEmployee_id() {
@@ -62,9 +84,17 @@ public class EmployeeDTO {
         this.email = email;
     }
 
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
     @Override
     public String toString() {
-        return "EmployeeDTO{" +
+        return "Employee{" +
                 "employee_id=" + employee_id +
                 ", name='" + name + '\'' +
                 ", lastname='" + lastname + '\'' +
@@ -73,3 +103,17 @@ public class EmployeeDTO {
                 '}';
     }
 }
+
+//postman, @Post body example:
+
+//{
+//    "name": "Claudia",
+//    "lastname": "Lopez",
+//    "phone_number": "845632188",
+//    "email": "claud33@live.com",
+//    "department": {
+//      "department_id": 12,
+//      "department_name": "Recursos Humanos"
+//    }
+//  }
+

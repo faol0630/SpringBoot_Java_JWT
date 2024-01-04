@@ -1,6 +1,7 @@
-package com.faol.JWT.security.crud.controller.dto;
+package com.faol.JWT.security.employee.controller.dto;
 
-import com.faol.JWT.security.crud.entity.Employee;
+import com.faol.JWT.security.deparment.entity.Department;
+import com.faol.JWT.security.employee.entity.Employee;
 
 public class EmployeeDTOToEmployee {
 
@@ -12,6 +13,7 @@ public class EmployeeDTOToEmployee {
                 .lastname(employeeDTO.getLastname())
                 .name(employeeDTO.getName())
                 .phone_number(employeeDTO.getPhone_number())
+                .department(employeeDTO.getDepartment())
                 .build();
 
         return employee;

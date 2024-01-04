@@ -1,7 +1,7 @@
-package com.faol.JWT.security.crud.service;
+package com.faol.JWT.security.employee.service;
 
-import com.faol.JWT.security.crud.entity.Employee;
-import com.faol.JWT.security.crud.repository.EmployeeRepository;
+import com.faol.JWT.security.employee.entity.Employee;
+import com.faol.JWT.security.employee.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,9 +67,21 @@ public class EmployeeServiceImpl implements EmployeeServiceInt {
         newEmployee.setLastname(employee.getLastname());
         newEmployee.setName(employee.getName());
         newEmployee.setPhone_number(employee.getPhone_number());
+        newEmployee.setDepartment(employee.getDepartment());
 
         repo.save(newEmployee);
         return newEmployee;
 
     }
+
+    @Override
+    public List<Employee> getEmployeesByDepartmentId(Long department_id) {
+        Optional<List<Employee>> employees = repo.findByDepartmentId(department_id);
+
+        List<Employee> employeeList = employees.get();
+        return employeeList;
+
+    }
+
+
 }

@@ -1,15 +1,17 @@
-package com.faol.JWT.security.crud.controller;
+package com.faol.JWT.security.employee.controller;
 
-import com.faol.JWT.security.crud.controller.dto.EmployeeDTO;
-import com.faol.JWT.security.crud.controller.dto.EmployeeDTOToEmployee;
-import com.faol.JWT.security.crud.controller.dto.EmployeeToEmployeeDTO;
-import com.faol.JWT.security.crud.entity.Employee;
-import com.faol.JWT.security.crud.service.EmployeeServiceInt;
+import com.faol.JWT.security.employee.controller.dto.EmployeeDTO;
+import com.faol.JWT.security.employee.controller.dto.EmployeeDTOToEmployee;
+import com.faol.JWT.security.employee.controller.dto.EmployeeToEmployeeDTO;
+import com.faol.JWT.security.employee.entity.Employee;
+import com.faol.JWT.security.employee.service.EmployeeServiceInt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,11 +45,16 @@ public class EmployeeController {
 
             }).collect(Collectors.toList());
 
-            return ResponseEntity.status(HttpStatus.OK).body(employeeDTOList);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(employeeDTOList);
 
         } else {
 
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .build();
         }
     }
 
@@ -164,6 +171,25 @@ public class EmployeeController {
 
         }
 
+    }
+
+    @GetMapping("/{department_id}/employees")
+    public ResponseEntity<List<Employee>> getEmployeesByDepartmentId(@PathVariable("department_id") Long department_id) {
+
+        List<Employee> employees = service.getEmployeesByDepartmentId(department_id);
+
+        if (!employees.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON) //para ver la lista employees en postman
+                    .body(employees);
+        } else {
+
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Collections.emptyList());
+        }
     }
 
 }

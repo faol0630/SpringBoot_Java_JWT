@@ -1,41 +1,28 @@
-package com.faol.JWT.security.crud.entity;
+package com.faol.JWT.security.employee.controller.dto;
 
-import jakarta.persistence.*;
+import com.faol.JWT.security.deparment.entity.Department;
 import lombok.Builder;
 
-@Entity
-@Table(name = "employee")
 @Builder
-public class Employee {
+public class EmployeeDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long employee_id;
-
-    @Column(name = "name", nullable = false, unique = true, length = 40)
     private String name;
-
-    @Column(name = "lastname", nullable = false, length = 40)
     private String lastname;
-
-    @Column(name = "phone_number", nullable = false,  length = 10)
     private String phone_number;
-
-    @Column(name = "email", nullable = false,  length = 40)
     private String email;
+    private Department department;
 
-    /*@Column(name = "birth_date", nullable = false, unique = true, length = 10)
-    private LocalDate birth_date;*/
-
-    public Employee() {
+    public EmployeeDTO() {
     }
 
-    public Employee(Long employee_id, String name, String lastname, String phone_number, String email) {
+    public EmployeeDTO(Long employee_id, String name, String lastname, String phone_number, String email, Department department) {
         this.employee_id = employee_id;
         this.name = name;
         this.lastname = lastname;
         this.phone_number = phone_number;
         this.email = email;
+        this.department = department;
     }
 
     public Long getEmployee_id() {
@@ -78,14 +65,23 @@ public class Employee {
         this.email = email;
     }
 
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
     @Override
     public String toString() {
-        return "Employee{" +
+        return "EmployeeDTO{" +
                 "employee_id=" + employee_id +
                 ", name='" + name + '\'' +
                 ", lastname='" + lastname + '\'' +
                 ", phone_number='" + phone_number + '\'' +
                 ", email='" + email + '\'' +
+                ", department=" + department +
                 '}';
     }
 }
