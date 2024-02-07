@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AddressServiceImpl implements AddressServiceInt{
+public class AddressServiceImpl implements AddressServiceInt {
 
     @Autowired
     AddressRepository repo;
@@ -25,41 +25,46 @@ public class AddressServiceImpl implements AddressServiceInt{
     }
 
     @Override
-    public Address insertNewAddress(Address address){
+    public Address insertNewAddress(Address address) {
 
-        if (address.getStreet() != null){
+        if (address.getStreet() != null) {
             repo.save(address);
         }
         return address;
     }
 
     @Override
-    public Address updateAddress(Long address_id, Address newAddress) {
-        Address address = new Address();
+    public Optional<Address> updateAddress(Long address_id, Address newAddress) {
+
         Optional<Address> result = repo.findById(address_id);
 
         if (result.isPresent()) {
-            address = result.orElseThrow();
+
+            Address address = result.orElseThrow();
             address.setNumber(newAddress.getNumber());
             address.setStreet(newAddress.getStreet());
             address.setPostcode(newAddress.getPostcode());
+            repo.save(address);
+            return Optional.of(address);
+
+        } else {
+            return Optional.empty();
         }
-        return repo.save(address);
     }
 
     @Override
-    public void deleteAddress(Long address_id){
+    public void deleteAddress(Long address_id) {
 
         Optional<Address> result = repo.findById(address_id);
-        if (result.isPresent()){
+        if (result.isPresent()) {
             repo.deleteById(result.get().getAddress_id());
         }
     }
 
     @Override
-    public void deleteAllAddresses(){
+    public void deleteAllAddresses() {
 
-            repo.deleteAll();
+        repo.deleteAll();
     }
 }
 

@@ -125,7 +125,7 @@ public class Employee {
     }
 }
 
-//postman, @Post body example:
+//postman, @Post  body example:
 
 /*{
         "name": "Lorena",

@@ -1,12 +1,16 @@
 package com.faol.JWT.security.employee.service;
 
+
+import com.faol.JWT.security.employee.controller.dto.EmployeeDTO;
+import com.faol.JWT.security.employee.controller.dto.EmployeeDTOToEmployee;
+import com.faol.JWT.security.employee.controller.dto.EmployeeToEmployeeDTO;
 import com.faol.JWT.security.employee.entity.Employee;
 import com.faol.JWT.security.employee.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeServiceInt {
@@ -14,40 +18,72 @@ public class EmployeeServiceImpl implements EmployeeServiceInt {
     @Autowired
     EmployeeRepository repo;
 
-    @Override
-    public Optional<Employee> findEmployeeById(Long employee_id) {
+    private final EmployeeToEmployeeDTO employeeToEmployeeDTO;
 
-        return repo.findById(employee_id);
+    public EmployeeServiceImpl(){
+        employeeToEmployeeDTO = new EmployeeToEmployeeDTO();
     }
 
     @Override
-    public Optional<Employee> findEmployeeByName(String name) {
-
-        return repo.findEmployeeByName(name);
-
-    }
-
-    @Override
-    public List<Employee> findAllEmployees() {
-
-        List<Employee> employees = repo.findAll();
-        return employees;
-
-    }
-
-    @Override
-    public Employee saveNewEmployee(Employee employee) {
-
-        Employee employee1 = repo.save(employee);
-        return employee1;
-    }
-
-    @Override
-    public Employee deleteEmployeeById(Long employee_id) {
+    public Optional<EmployeeDTO> findEmployeeById(Long employee_id) {
 
         Optional<Employee> employee = repo.findById(employee_id);
+
+        return employee.map(EmployeeToEmployeeDTO::employeeToEmployeeDTO);
+
+
+    }
+
+    @Override
+    public Optional<EmployeeDTO> findEmployeeByName(String name) {
+
+        Optional<Employee> employee = repo.findEmployeeByName(name);
+
+        return employee.map(EmployeeToEmployeeDTO::employeeToEmployeeDTO);
+
+    }
+
+    @Override
+    public Optional<List<EmployeeDTO>> findAllEmployees() {
+
+        List<Employee> employees = repo.findAll();
+
+        if (!employees.isEmpty()) {
+
+            List<EmployeeDTO> employeeDTOList = employees.stream().map(employee -> {
+
+                return employeeToEmployeeDTO.employeeToEmployeeDTO(employee);
+
+            }).collect(Collectors.toList());
+
+            Collections.sort(employeeDTOList); //sorted by id
+
+            return Optional.of(employeeDTOList);
+        }else{
+
+            return Optional.empty();
+        }
+
+
+    }
+
+    @Override
+    public EmployeeDTO saveNewEmployee(EmployeeDTO employeeDTO) {
+
+        Employee newEmployee = EmployeeDTOToEmployee.employeeDTOToEmployee(employeeDTO);
+
+        repo.save(newEmployee);
+        return employeeDTO;
+
+    }
+
+    @Override
+    public Optional<EmployeeDTO> deleteEmployeeById(Long employee_id) {
+
+        Optional<Employee> employee = repo.findById(employee_id);
+        Optional<EmployeeDTO> employeeDTOOptional = employee.map(EmployeeToEmployeeDTO::employeeToEmployeeDTO);
         repo.deleteById(employee_id);
-        return employee.get();
+        return employeeDTOOptional;
 
     }
 
@@ -59,19 +95,19 @@ public class EmployeeServiceImpl implements EmployeeServiceInt {
     }
 
     @Override
-    public Employee updateEmployee(Long employee_id, Employee employee) {
+    public Optional<EmployeeDTO> updateEmployee(Long employee_id, EmployeeDTO employeeDTO) {
 
-        Employee newEmployee = repo.findById(employee_id).get();
+        Optional<Employee> newEmployee = repo.findById(employee_id);
 
-        newEmployee.setEmail(employee.getEmail());
-        newEmployee.setLastname(employee.getLastname());
-        newEmployee.setName(employee.getName());
-        newEmployee.setPhone_number(employee.getPhone_number());
-        newEmployee.setDepartment(employee.getDepartment());
-        newEmployee.setAddress(employee.getAddress());
+        if (newEmployee.isPresent()){
 
-        repo.save(newEmployee);
-        return newEmployee;
+            //repo.save(newEmployee.get());
+            saveNewEmployee(employeeDTO);
+            return Optional.of(employeeDTO);
+
+        }else{
+            return Optional.empty();
+        }
 
     }
 

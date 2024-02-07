@@ -16,7 +16,4 @@ public interface DepartmentServiceInt {
     Optional<DepartmentDTO> deleteDepartment(Long department_id);
     String deleteAllDepartments();
 
-
-
-
 }

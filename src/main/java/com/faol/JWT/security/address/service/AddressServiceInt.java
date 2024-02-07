@@ -10,7 +10,7 @@ public interface AddressServiceInt {
     List<Address> getAllAddresses();
     Optional<Address> getAddressById(Long address_id);
     Address insertNewAddress(Address address);
-    Address updateAddress(Long address_id, Address newAddress);
+    Optional<Address> updateAddress(Long address_id, Address newAddress);
     void deleteAddress(Long address_id);
     void deleteAllAddresses();
 }

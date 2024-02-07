@@ -1,195 +1,218 @@
 package com.faol.JWT.security.employee.controller;
 
 import com.faol.JWT.security.employee.controller.dto.EmployeeDTO;
-import com.faol.JWT.security.employee.controller.dto.EmployeeDTOToEmployee;
-import com.faol.JWT.security.employee.controller.dto.EmployeeToEmployeeDTO;
 import com.faol.JWT.security.employee.entity.Employee;
 import com.faol.JWT.security.employee.service.EmployeeServiceInt;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @RestController
 @RequestMapping("/employee")
 public class EmployeeController {
 
-    private final EmployeeDTOToEmployee employeeDTOToEmployee ;
-
-    private final EmployeeToEmployeeDTO employeeToEmployeeDTO ;
-
-    public EmployeeController(){
-        employeeDTOToEmployee = new EmployeeDTOToEmployee();
-        employeeToEmployeeDTO = new EmployeeToEmployeeDTO();
-    }
-
     @Autowired
     EmployeeServiceInt service;
 
     @GetMapping("/all")
-    public ResponseEntity<List<?>> getAllEmployees() {
+    public ResponseEntity<?> getAllEmployees() {
 
-        List<Employee> employeesList = service.findAllEmployees();
+        Optional<List<EmployeeDTO>> employeesList = service.findAllEmployees();
+        HashMap<String, Object> response = new LinkedHashMap<>();
 
-        if (!employeesList.isEmpty()) {
+        if (employeesList.isPresent()) {
 
-            List<EmployeeDTO> employeeDTOList = employeesList.stream().map(employee -> {
-
-                return employeeToEmployeeDTO.employeeToEmployeeDTO(employee);
-
-            }).collect(Collectors.toList());
+            response.put("message", "List found");
+            response.put("list", employeesList);
 
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(employeeDTOList);
+                    .body(response);
 
         } else {
-
+            response.put("message", "error finding list or empty list");
             return ResponseEntity
                     .status(HttpStatus.NO_CONTENT)
-                    .build();
+                    .body(response);
         }
     }
 
     @GetMapping("/get_one/{employee_id}")
     public ResponseEntity<?> getEmployeeById(@PathVariable("employee_id") Long employee_id) {
 
-        Optional<Employee> optionalEmployee = service.findEmployeeById(employee_id);
+        Optional<EmployeeDTO> employeeDTO = service.findEmployeeById(employee_id);
 
-        if (optionalEmployee.isPresent()) {
+        Map<String, Object> response = new LinkedHashMap<>();
 
-            Employee employee1 = optionalEmployee.get();
-            EmployeeDTO employeeDTO = employeeToEmployeeDTO.employeeToEmployeeDTO(employee1);
+        if (employeeDTO.isPresent()) {
 
-            return ResponseEntity.status(HttpStatus.OK).body(employeeDTO);
+            response.put("message", "employee found");
+            response.put("employeeDTO", employeeDTO.get());
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } else {
 
-            EmployeeDTO employeeDTO = new EmployeeDTO();
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(employeeDTO);
+            response.put("message", "employee with id " + employee_id + " not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 
         }
 
     }
 
     @GetMapping("/get_by_name/{name}")
-    public ResponseEntity<?> getEmployeeByName(@PathVariable("name") String name) {
+    public ResponseEntity<?> getEmployeeByName(@PathVariable String name) {
 
-        List<Employee> employeesList = service.findAllEmployees();
-        Employee employee = service.findEmployeeByName(name).get();
+        Optional<EmployeeDTO> employeeDTO = service.findEmployeeByName(name);
 
-        if (employeesList.contains(employee)) {
+        Map<String, Object> response = new LinkedHashMap<>();
 
-            EmployeeDTO employeeDTO = employeeToEmployeeDTO.employeeToEmployeeDTO(employee);
+        if (employeeDTO.isPresent()) {
 
-            return ResponseEntity.status(HttpStatus.OK).body(employeeDTO);
+            response.put("message", "employee found");
+            response.put("employeeDTO", employeeDTO.get());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } else {
 
-            EmployeeDTO employeeDTO = new EmployeeDTO();
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(employeeDTO);
+            response.put("message", "employee not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 
         }
 
     }
 
     @PostMapping("/new_employee")
-    public ResponseEntity<?> saveNewEmployee(@RequestBody EmployeeDTO employeeDTO) {
-        if (!employeeDTO.getName().isEmpty()) {
+    public ResponseEntity<?> saveNewEmployee(@RequestBody @Valid EmployeeDTO employeeDTO) {
 
-            Employee employee = employeeDTOToEmployee.employeeDTOToEmployee(employeeDTO);
+        Map<String, Object> response = new LinkedHashMap<>();
 
-            service.saveNewEmployee(employee);
+        Optional<EmployeeDTO> result = Optional.of(employeeDTO);
 
-            return ResponseEntity.status(HttpStatus.OK).body(employee);
-        }else{
-             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(employeeDTO);
+        if (result.isPresent()) {
+
+            EmployeeDTO employeeDTO1 = service.saveNewEmployee(employeeDTO);
+            response.put("message", "employee created");
+            response.put("employeeDTO1", employeeDTO1);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        }else {
+            response.put("message", "error saving new employee");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteEmployee(@PathVariable("id") Long id) {
-        Optional<Employee> optionalEmployee = service.findEmployeeById(id);
 
-        if (optionalEmployee.isPresent()) {
+        Optional<EmployeeDTO> employeeDTO = service.findEmployeeById(id);
+        Map<String, Object> response = new HashMap<>();
+
+        if (employeeDTO.isPresent()) {
 
             service.deleteEmployeeById(id);
-
-            //to not directly return the Entity:
-            Employee employee = optionalEmployee.get();
-            EmployeeDTO employeeDTO = employeeToEmployeeDTO.employeeToEmployeeDTO(employee);
-
-            return ResponseEntity.status(HttpStatus.OK).body(employeeDTO);
+            response.put("message", "employee with id " + id + " deleted");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } else {
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            response.put("message", "error deleting employee.employee with id " + id + " not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 
         }
     }
 
     @DeleteMapping("/delete_all")
-    public ResponseEntity<List<Employee>> deleteAllEmployees() {
+    public ResponseEntity<?> deleteAllEmployees() {
 
-        List<Employee> employeeList = service.findAllEmployees();
+        Optional<List<EmployeeDTO>> employeeList = service.findAllEmployees();
+        HashMap<String, Object> response = new HashMap<>();
 
-        if (!employeeList.isEmpty()) {
+        if (employeeList.isPresent()) {
 
             service.deleteAllEmployees();
-            return ResponseEntity.status(HttpStatus.OK).build();
+            response.put("message", "all employees deleted");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } else {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            response.put("message", "empty list.nothing to delete");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
         }
     }
 
     @PutMapping("/update/{employee_id}")
-    public ResponseEntity<?> updateEmployee(@PathVariable("employee_id") Long employee_id, @RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<?> updateEmployee(@PathVariable Long employee_id, @RequestBody @Valid EmployeeDTO employeeDTO) {
 
-        Optional<Employee> optionalEmployee = service.findEmployeeById(employee_id);
+        Optional<EmployeeDTO> employeeDTO1 = service.findEmployeeById(employee_id);
+        Map<String, Object> response = new LinkedHashMap<>();
 
-        if (optionalEmployee.isPresent()) {
+        if (employeeDTO1.isPresent()) {
 
-            Employee employee = employeeDTOToEmployee.employeeDTOToEmployee(employeeDTO);
-
-            service.updateEmployee(employee_id, employee);
-
-            return ResponseEntity.status(HttpStatus.OK).body(employeeDTO);
+            Optional<EmployeeDTO> employeeDTO2 = service.updateEmployee(employee_id, employeeDTO);
+            response.put("message", "employee updated");
+            response.put("employeeDTO", employeeDTO2.get());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } else {
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            response.put("message", "employee not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 
         }
 
     }
 
     @GetMapping("/{department_id}/employees")
-    public ResponseEntity<List<Employee>> getEmployeesByDepartmentId(@PathVariable("department_id") Long department_id) {
+    public ResponseEntity<?> getEmployeesByDepartmentId(@PathVariable("department_id") Long department_id) {
 
         List<Employee> employees = service.getEmployeesByDepartmentId(department_id);
 
+        Map<String, Object> response = new LinkedHashMap<>();
+
         if (!employees.isEmpty()) {
+
+            response.put("message", "employees found");
+            response.put("Employee's list", employees);
+
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON) //para ver la lista employees en postman
-                    .body(employees);
+                    .contentType(MediaType.APPLICATION_JSON) //see the employees list in postman
+                    .body(response);
         } else {
+
+            response.put("message", "employees with department id " + department_id + " not found");
 
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(Collections.emptyList());
+                    .body(response);
         }
     }
 
 }
+//example of postman body update employee:
+
+//{
+//    "employee_id": 1702,
+//    "name": "Samuel",
+//    "lastname": "Del Real",
+//    "phone_number": "882738129",
+//    "email": "samuel_del_real@live.net",
+//    "department" : {
+//      "department_id": 10,
+//      "department_name": "Calidad"
+//
+//    },
+//    "address" : {
+//      "address_id": 4,
+//      "number": "4",
+//      "postcode": "77322",
+//      "street": "Vallecas"
+//    }
+//
+//  }

@@ -2,17 +2,38 @@ package com.faol.JWT.security.employee.controller.dto;
 
 import com.faol.JWT.security.address.entity.Address;
 import com.faol.JWT.security.deparment.entity.Department;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
-public class EmployeeDTO {
+public class EmployeeDTO implements Comparable<EmployeeDTO>{
 
     private Long employee_id;
+
+    @NotNull(message = "Name must not be null")
+    @Size(min = 3, max = 15)
     private String name;
+
+    @NotNull(message = "Lastname must not be null")
+    @Size(min = 3, max = 15)
     private String lastname;
+
+    @NotNull(message = "Phone number must not be null")
+    @Size(max = 10)
     private String phone_number;
+
+    @Email(message = "Email must be in a valid format")
+    @NotNull(message = "Email must not be null")
+    @Size(max = 30)
     private String email;
+
+    //@Valid
     private Department department;
+
+    //@Valid //to validate nested object
     private Address address;
 
     public EmployeeDTO() {
@@ -95,5 +116,10 @@ public class EmployeeDTO {
                 ", department_id=" + department.getDepartment_id() +
                 ", address_id=" + address.getAddress_id() +
                 '}';
+    }
+
+    @Override
+    public int compareTo(EmployeeDTO employeeDTO) {
+        return employee_id.compareTo(employeeDTO.getEmployee_id());
     }
 }

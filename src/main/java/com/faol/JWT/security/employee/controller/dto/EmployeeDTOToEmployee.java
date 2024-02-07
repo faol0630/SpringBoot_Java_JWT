@@ -1,11 +1,12 @@
 package com.faol.JWT.security.employee.controller.dto;
 
-import com.faol.JWT.security.deparment.entity.Department;
+
 import com.faol.JWT.security.employee.entity.Employee;
 
 public class EmployeeDTOToEmployee {
 
-    public Employee employeeDTOToEmployee(EmployeeDTO employeeDTO){
+    public static Employee employeeDTOToEmployee(EmployeeDTO employeeDTO){
+
 
         Employee employee = Employee.builder()
                 .email(employeeDTO.getEmail())
@@ -16,7 +17,6 @@ public class EmployeeDTOToEmployee {
                 .department(employeeDTO.getDepartment())
                 .address(employeeDTO.getAddress())
                 .build();
-
 
         return employee;
 
